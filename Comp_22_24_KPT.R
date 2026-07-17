@@ -24,6 +24,7 @@ Complete_cases_KPT2224 <- KPT_uagyerekek22_24_comp %>%
 View
 
 colnames(Complete_cases_KPT2224)
+table(Complete_cases_KPT2224$nem)
 
 #-----------------------
 # CFA for KPT1
@@ -307,7 +308,14 @@ fitMeasures(
 anova(fit_configural, fit_metric)
 
 # ============================================================
-#
+# Problems :
+# - first we excluded incomplete cases --> 485 cases left,w kids who took part in both
+# data collecting occasions
+# - it seems previously data were not adequately filtered which lead to no effect, but
+# on the filtered data there was no metric invariance
+# - large differences in variance between variables (eg. 0-10 vs 0-9000 )
+# - 2 manifest variables on most of the factors
+# my next move should be a network + invariance tests
 # ============================================================
 
 
