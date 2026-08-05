@@ -2,6 +2,8 @@ library(readxl)
 library(dplyr)
 library(knitr)
 library(lavaan)
+library(bootnet)
+library(psych)
 
 KPT_uagyerekek22_24_comp <- read_excel("C:/Users/Haász Evelin/Desktop/Egyetem/Kognitív Képességek Kutatócsoport/Connections between sensorimotor and cognitive abilities, and school performance/KPT2/KPT_uagyerekek22_24_comp.xlsx")
 View(KPT_uagyerekek22_24_comp)
@@ -62,5 +64,37 @@ data2024 <- data2024 %>%
           BOL = Egyensuly_nyitottszem_bal_2,
           Corsi = Corsi_2,
           Fingers = Ujjak_2,
-          Figures = Figurak_2)
-    
+          Figures = Figurak_2) 
+
+#-----------------------
+# - ID from the network
+#-----------------------
+
+data2022_r <- data2022 %>%
+  select(-id)
+
+data2024_r <- data2024 %>%
+  select(-id)
+
+
+#----------------------
+#corr 
+#----------------------
+
+cor2022 <- corr.test(
+  data2022_r,
+  method = "spearman",
+  adjust = "none"
+)
+cor2022
+
+cor2024 <- corr.test(
+  data2024_r,
+  method = "spearman",
+  adjust = "none"
+)
+cor2024
+
+
+
+
