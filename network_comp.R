@@ -5,67 +5,147 @@ library(lavaan)
 library(bootnet)
 library(psych)
 library(qgraph)
+library(NetworkComparisonTest)
+library(psychonetrics)
 
-KPT_uagyerekek22_24_comp <- read_excel("C:/Users/Haász Evelin/Desktop/Egyetem/Kognitív Képességek Kutatócsoport/Connections between sensorimotor and cognitive abilities, and school performance/KPT2/KPT_uagyerekek22_24_comp.xlsx")
+#-------------------------------------------------
+# Load data
+#-------------------------------------------------
+
+KPT_uagyerekek22_24_comp <- read_excel(
+  "C:/Users/Haász Evelin/Desktop/Egyetem/Kognitív Képességek Kutatócsoport/Connections between sensorimotor and cognitive abilities, and school performance/KPT2/KPT_uagyerekek22_24_comp.xlsx"
+)
+
 View(KPT_uagyerekek22_24_comp)
+
 colnames(KPT_uagyerekek22_24_comp)
+nrow(KPT_uagyerekek22_24_comp)
+table(KPT_uagyerekek22_24_comp$nem)
 
-data2022 <- KPT_uagyerekek22_24_comp %>%
-                select(anonim_id,
-                       Szamsorozatvisszafele_1,
-                       Szamismetles_1,
-                       Kezek_1,
-                       Raven_1,
-                       Egyensuly_nyitottszem_jobb_1,
-                       Egyensuly_csukottszem_jobb_1,
-                       Egyensuly_csukottszem_bal_1,
-                       Egyensuly_nyitottszem_bal_1,
-                       Corsi_1,
-                       Ujjak_1,
-                       Figurak_1)
 
-data2024 <- KPT_uagyerekek22_24_comp %>%
-  select(anonim_id,
-         Szamsorozatvisszafele_2,
-         Szamismetles_2,
-         Kezek_2,
-         Raven_2,
-         Egyensuly_nyitottszem_jobb_2,
-         Egyensuly_csukottszem_jobb_2,
-         Egyensuly_csukottszem_bal_2,
-         Egyensuly_nyitottszem_bal_2,
-         Corsi_2,
-         Ujjak_2,
-         Figurak_2)
+#-------------------------------------------------
+# Keep only children with complete data at both waves
+#-------------------------------------------------
+
+network_vars <- c(
+  "Szamsorozatvisszafele_1",
+  "Szamismetles_1",
+  "Kezek_1",
+  "Raven_1",
+  "Egyensuly_nyitottszem_jobb_1",
+  "Egyensuly_csukottszem_jobb_1",
+  "Egyensuly_csukottszem_bal_1",
+  "Egyensuly_nyitottszem_bal_1",
+  "Corsi_1",
+  "Ujjak_1",
+  "Figurak_1",
+  
+  "Szamsorozatvisszafele_2",
+  "Szamismetles_2",
+  "Kezek_2",
+  "Raven_2",
+  "Egyensuly_nyitottszem_jobb_2",
+  "Egyensuly_csukottszem_jobb_2",
+  "Egyensuly_csukottszem_bal_2",
+  "Egyensuly_nyitottszem_bal_2",
+  "Corsi_2",
+  "Ujjak_2",
+  "Figurak_2"
+)
+
+
+KPT_complete <- KPT_uagyerekek22_24_comp %>%
+  filter(if_all(all_of(network_vars), ~ !is.na(.)))
+
+
+# check sample size
+nrow(KPT_complete)
+
+
+#-------------------------------------------------
+# Create 2022 and 2024 datasets from same children
+#-------------------------------------------------
+
+data2022 <- KPT_complete %>%
+  select(
+    anonim_id,
+    Szamsorozatvisszafele_1,
+    Szamismetles_1,
+    Kezek_1,
+    Raven_1,
+    Egyensuly_nyitottszem_jobb_1,
+    Egyensuly_csukottszem_jobb_1,
+    Egyensuly_csukottszem_bal_1,
+    Egyensuly_nyitottszem_bal_1,
+    Corsi_1,
+    Ujjak_1,
+    Figurak_1
+  )
+
+
+data2024 <- KPT_complete %>%
+  select(
+    anonim_id,
+    Szamsorozatvisszafele_2,
+    Szamismetles_2,
+    Kezek_2,
+    Raven_2,
+    Egyensuly_nyitottszem_jobb_2,
+    Egyensuly_csukottszem_jobb_2,
+    Egyensuly_csukottszem_bal_2,
+    Egyensuly_nyitottszem_bal_2,
+    Corsi_2,
+    Ujjak_2,
+    Figurak_2
+  )
+
+
+#-------------------------------------------------
+# Rename variables
+#-------------------------------------------------
 
 data2022 <- data2022 %>%
-  rename( id = anonim_id,
-          BDS = Szamsorozatvisszafele_1,
-          FDS = Szamismetles_1,
-          Hands = Kezek_1,
-          Raven = Raven_1,
-          BOR = Egyensuly_nyitottszem_jobb_1,
-          BCR = Egyensuly_csukottszem_jobb_1,
-          BCL = Egyensuly_csukottszem_bal_1,
-          BOL = Egyensuly_nyitottszem_bal_1,
-          Corsi = Corsi_1,
-          Fingers = Ujjak_1,
-          Figures = Figurak_1)
+  rename(
+    id = anonim_id,
+    BDS = Szamsorozatvisszafele_1,
+    FDS = Szamismetles_1,
+    Hands = Kezek_1,
+    Raven = Raven_1,
+    BOR = Egyensuly_nyitottszem_jobb_1,
+    BCR = Egyensuly_csukottszem_jobb_1,
+    BCL = Egyensuly_csukottszem_bal_1,
+    BOL = Egyensuly_nyitottszem_bal_1,
+    Corsi = Corsi_1,
+    Fingers = Ujjak_1,
+    Figures = Figurak_1
+  )
 
 
 data2024 <- data2024 %>%
-  rename( id = anonim_id,
-          BDS = Szamsorozatvisszafele_2,
-          FDS = Szamismetles_2,
-          Hands = Kezek_2,
-          Raven = Raven_2,
-          BOR = Egyensuly_nyitottszem_jobb_2,
-          BCR = Egyensuly_csukottszem_jobb_2,
-          BCL = Egyensuly_csukottszem_bal_2,
-          BOL = Egyensuly_nyitottszem_bal_2,
-          Corsi = Corsi_2,
-          Fingers = Ujjak_2,
-          Figures = Figurak_2) 
+  rename(
+    id = anonim_id,
+    BDS = Szamsorozatvisszafele_2,
+    FDS = Szamismetles_2,
+    Hands = Kezek_2,
+    Raven = Raven_2,
+    BOR = Egyensuly_nyitottszem_jobb_2,
+    BCR = Egyensuly_csukottszem_jobb_2,
+    BCL = Egyensuly_csukottszem_bal_2,
+    BOL = Egyensuly_nyitottszem_bal_2,
+    Corsi = Corsi_2,
+    Fingers = Ujjak_2,
+    Figures = Figurak_2
+  )
+
+
+#-------------------------------------------------
+# Check longitudinal matching
+#-------------------------------------------------
+
+nrow(data2022)
+nrow(data2024)
+
+identical(data2022$id, data2024$id)
 
 #-----------------------
 # - ID from the network
@@ -332,4 +412,32 @@ top_edges24
 #--------------------------------------------------------
 # case-dropping bootstrap
 #--------------------------------------------------------
+bootcase22 <- bootnet(
+  data = data2022_r,
+  nBoots = 500,
+  default = "EBICglasso",
+  corMethod = "cor",
+  corArgs = list(method = "spearman"),
+  statistics = "strength",
+  type = "case",
+  nCores = 1
+)
+
+corStability(bootcase22)
+
+bootcase24 <- bootnet(
+  data = data2024_r,
+  nBoots = 500,
+  default = "EBICglasso",
+  corMethod = "cor",
+  statistics = "strength",
+  type = "case",
+  nCores = 1
+)
+
+corStability(bootcase24)
+
+#-------------------------------
+#longitudinal model
+#-------------------------------
 
